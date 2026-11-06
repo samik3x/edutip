@@ -242,7 +242,7 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
 // ── PREDMETY (SUBJECTS) ──────────────────────────────────────────
 
 app.get('/api/predmety', requireAuth, (req, res) => {
-  const predmety = db.prepare('SELECT id, nazov, "" AS ucitel, has_groups FROM predmety ORDER BY nazov').all();
+  const predmety = db.prepare("SELECT id, nazov, '' AS ucitel, has_groups FROM predmety ORDER BY nazov").all();
   res.json(predmety);
 });
 
@@ -250,7 +250,7 @@ app.get('/api/predmety', requireAuth, (req, res) => {
 app.get('/api/predmety/edupage', requireAuth, (req, res) => {
   const currentUser = db.prepare('SELECT trieda, skupina, is_admin FROM users WHERE id = ?').get(req.session.userId);
 
-  const predmety = db.prepare('SELECT id, nazov, "" AS ucitel, has_groups FROM predmety ORDER BY nazov').all();
+  const predmety = db.prepare("SELECT id, nazov, '' AS ucitel, has_groups FROM predmety ORDER BY nazov").all();
 
   const result = predmety.map(p => {
     // For admin show all pisomky or filtered; for students show their class
