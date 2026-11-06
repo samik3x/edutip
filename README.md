@@ -40,8 +40,3 @@ Moderná webová aplikácia pre triedne a školské tipovanie známok z písomie
 
 ---
 
-## ☁️ Nasadenie na internet (Railway / Render / VPS)
-
-- **Railway.app:** Pripoj svoj GitHub repozitár a pridaj **Volume** (disk) pre perzistenciu SQLite databázy (`tipovacka.db`).
-- **Render.com:** Web Service s Node.js prostredím.
-- **VPS (Ubuntu):** Spusti pomocou `pm2 start server.js` a Nginx reverzného proxy.
