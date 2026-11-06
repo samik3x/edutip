@@ -127,20 +127,20 @@ const predmetyCount = db.prepare('SELECT COUNT(*) as c FROM predmety').get().c;
 if (predmetyCount === 0) {
   const insertPredmet = db.prepare('INSERT INTO predmety (nazov, ucitel, has_groups) VALUES (?, ?, ?)');
   const defaultPredmety = [
-    ['Anglický jazyk', 'Andrea Karaffová', 1],
-    ['Digitálne technológie', 'Matúš Grečko', 1],
-    ['Ekonomika', 'Viera Kubovčíková', 1],
-    ['Elektronika', 'Miloš Sokol', 0],
-    ['Informačné a databázové systémy', 'Tomáš Zekucia', 1],
-    ['Matematika', 'Lucie Paľuchová', 0],
-    ['Občianska náuka', 'Katarína Keritová', 0],
-    ['Operačné systémy', 'Tomáš Zekucia', 1],
-    ['Programovanie', 'Jozef Labuda', 1],
-    ['Programovanie mikropočítačov', 'Miloš Sokol', 1],
-    ['Sieťové a serverové technológie', 'Henrieta Tarajčáková', 1],
-    ['Slovenský jazyk a literatúra', 'Marta Nováková', 0],
+    ['Anglický jazyk', '', 1],
+    ['Digitálne technológie', '', 1],
+    ['Ekonomika', '', 1],
+    ['Elektronika', '', 0],
+    ['Informačné a databázové systémy', '', 1],
+    ['Matematika', '', 0],
+    ['Občianska náuka', '', 0],
+    ['Operačné systémy', '', 1],
+    ['Programovanie', '', 1],
+    ['Programovanie mikropočítačov', '', 1],
+    ['Sieťové a serverové technológie', '', 1],
+    ['Slovenský jazyk a literatúra', '', 0],
     ['Spracovanie grafiky na PC', '', 1],
-    ['Tvorba WWW stránok', 'Tomáš Zekucia', 1]
+    ['Tvorba WWW stránok', '', 1]
   ];
   for (const p of defaultPredmety) {
     insertPredmet.run(p[0], p[1], p[2]);

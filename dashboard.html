@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTip | Školské tipovanie známok</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="logo-icon">🎯</span>
+        <span class="logo-text">EduTip</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        <span>Prehľad</span>
+      </a>
+      <a href="#" class="nav-item" data-section="tipovanie">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="6"/>
+          <circle cx="12" cy="12" r="2"/>
+        </svg>
+        <span>Tipovať predmety</span>
+      </a>
+      <a href="#" class="nav-item" data-section="moje-tipy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Moje tipy</span>
+      </a>
+      <a href="#" class="nav-item" data-section="rebricek">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 21h8M12 17V3"/>
+          <path d="M17 8l-5-5-5 5"/>
+          <rect x="2" y="17" width="6" height="4" rx="1"/>
+          <rect x="9" y="13" width="6" height="8" rx="1"/>
+          <rect x="16" y="15" width="6" height="6" rx="1"/>
+        </svg>
+        <span>Rebríček</span>
+      </a>
+      <a href="#" class="nav-item" data-section="profil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Profil</span>
+      </a>
+      <a href="#" class="nav-item" id="navTickety" data-section="tickety" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        <span>Žiadosti & Tickety</span>
+      </a>
+      <a href="#" class="nav-item" id="navAdmin" data-section="admin" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        <span>⚙️ Admin Panel</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-mini" id="userMini">
+        <div class="user-mini-avatar" id="miniAvatar">?</div>
+        <div class="user-mini-info">
+          <span class="user-mini-name" id="miniName">Načítavam...</span>
+          <span class="user-mini-class" id="miniClass"></span>
+        </div>
+      </div>
+      <button class="btn-logout" id="logoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Odhlásiť</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile top bar -->
+  <header class="mobile-header" id="mobileHeader">
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <span class="mobile-title">🎯 EduTip</span>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ═══ OVERVIEW SECTION ═══ -->
+    <section class="content-section active" id="section-overview">
+      <div class="section-header">
+        <h1 class="section-title">Prehľad</h1>
+        <p class="section-subtitle">Vitaj v školskej Tipovačke! Tu vidíš svoje aktuálne skóre.</p>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card glass-card" style="--accent: #7c3aed">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-value" id="statMyTips">0</div>
+          <div class="stat-label">Moje tipy</div>
+        </div>
+        <div class="stat-card glass-card" style="--accent: #06b6d4">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="statCorrect">0</div>
+          <div class="stat-label">Presné zásahy</div>
+        </div>
+        <div class="stat-card glass-card" style="--accent: #f43f5e">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="statPoints">0</div>
+          <div class="stat-label">Body</div>
+        </div>
+        <div class="stat-card glass-card" style="--accent: #10b981">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="statUsers">0</div>
+          <div class="stat-label">Žiakov v škole</div>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="glass-card overview-card">
+          <h3>📊 Ako funguje bodovanie?</h3>
+          <div class="scoring-info">
+            <div class="score-rule">
+              <span class="score-badge exact">+3 body</span>
+              <span>Presný tip — uhádneš presnú známku spolužiaka</span>
+            </div>
+            <div class="score-rule">
+              <span class="score-badge close">+1 bod</span>
+              <span>Takmer — pomýliš sa iba o jednu známku</span>
+            </div>
+            <div class="score-rule">
+              <span class="score-badge wrong">0 bodov</span>
+              <span>Mimo — pomýliš sa o viac než jednu známku</span>
+            </div>
+          </div>
+        </div>
+        <div class="glass-card overview-card">
+          <h3>⚡ Rýchly prístup</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem; line-height:1.6; margin-bottom:1rem;">
+            Vyber si predmet v sekcii <strong>Tipovať predmety</strong>, rozklikni písomku a zadaj svoje tipy na spolužiakov!
+          </p>
+          <button class="btn btn-primary" onclick="document.querySelector('[data-section=\'tipovanie\']').click()">
+            <span>Prejsť na tipovanie</span>
+            <span>🎯</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ TIPOVANIE (EDUPAGE STYLE) SECTION ═══ -->
+    <section class="content-section" id="section-tipovanie">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h1 class="section-title">Tipovať predmety</h1>
+          <p class="section-subtitle">Rozklikni predmet, vyber písomku a tipuj známky spolužiakov</p>
+        </div>
+        <button class="btn btn-primary" id="btnQuickCreatePisomka" style="display:none;" onclick="openCreatePisomkaModal()">
+          <span>➕ Pridať novú písomku</span>
+        </button>
+      </div>
+
+      <div class="filter-bar glass-card">
+        <div class="search-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchSubjects" placeholder="Hľadať predmet..." class="search-input">
+        </div>
+        <div class="filter-chips">
+          <button class="chip active" data-filter="all" onclick="filterSubjects('all', this)">Všetky</button>
+          <button class="chip" data-filter="with_tests" onclick="filterSubjects('with_tests', this)">Má písomky 🔥</button>
+          <button class="chip" data-filter="groups" onclick="filterSubjects('groups', this)">2 skupiny (delené)</button>
+        </div>
+      </div>
+
+      <!-- EduPage Style Subjects List -->
+      <div class="edupage-container" id="edupageList">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Načítavam predmety a písomky...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ MOJE TIPY SECTION ═══ -->
+    <section class="content-section" id="section-moje-tipy">
+      <div class="section-header">
+        <h1 class="section-title">Moje tipy</h1>
+        <p class="section-subtitle">História a výsledky všetkých tvojich tipov</p>
+      </div>
+
+      <div class="my-tips-list" id="myTipsList">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Načítavam tipy...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ REBRÍČEK SECTION ═══ -->
+    <section class="content-section" id="section-rebricek">
+      <div class="section-header">
+        <h1 class="section-title">Rebríček</h1>
+        <p class="section-subtitle">Kto najlepšie pozná spolužiakov v škole?</p>
+      </div>
+
+      <div class="leaderboard glass-card" id="leaderboard">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Načítavam rebríček...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PROFIL SECTION ═══ -->
+    <section class="content-section" id="section-profil">
+      <div class="section-header">
+        <h1 class="section-title">Profil</h1>
+        <p class="section-subtitle">Tvoje osobné údaje a skupina</p>
+      </div>
+
+      <div class="profile-card glass-card" id="profileCard">
+        <div class="profile-header">
+          <div class="profile-avatar" id="profileAvatar">?</div>
+          <div class="profile-info">
+            <h2 id="profileName">Načítavam...</h2>
+            <span class="profile-username" id="profileUsername">@...</span>
+          </div>
+        </div>
+        <div class="profile-details">
+          <div class="profile-detail">
+            <span class="detail-label">Trieda</span>
+            <span class="detail-value" id="profileTrieda">-</span>
+          </div>
+          <div class="profile-detail">
+            <span class="detail-label">Skupina (v delených predmetoch)</span>
+            <span class="detail-value" id="profileSkupina">-</span>
+          </div>
+          <div class="profile-detail">
+            <span class="detail-label">Dátum narodenia</span>
+            <span class="detail-value" id="profileDatum">-</span>
+          </div>
+          <div class="profile-detail">
+            <span class="detail-label">Získané body</span>
+            <span class="detail-value" id="profileBody">0</span>
+          </div>
+          <div class="profile-detail">
+            <span class="detail-label">Člen od</span>
+            <span class="detail-value" id="profileCreated">-</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ TICKETY / ŽIADOSTI SECTION ═══ -->
+    <section class="content-section" id="section-tickety">
+      <div class="section-header">
+        <h1 class="section-title">🎫 Žiadosti & Zmeny</h1>
+        <p class="section-subtitle">Požiadaj administrátora o zmenu triedy, preradenie do druhej skupiny alebo opravu údajov</p>
+      </div>
+
+      <div class="overview-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Formulár na vytvorenie ticketu -->
+        <div class="glass-card overview-card">
+          <h3 style="margin-bottom: 1rem;">➕ Nová žiadosť</h3>
+          <form id="newTicketForm" style="display:flex; flex-direction:column; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Čoho sa žiadosť týka?</label>
+              <select id="ticketTyp" class="form-select" required onchange="handleTicketTypeChange(this.value)">
+                <option value="skupina">Zmena skupiny (Skupina 1 ⇄ Skupina 2)</option>
+                <option value="trieda">Zmena triedy (prestup do inej triedy)</option>
+                <option value="trieda_aj_skupina">Zmena triedy aj skupiny</option>
+                <option value="ine">Iná požiadavka</option>
+              </select>
+            </div>
+
+            <div class="form-row" id="ticketTargetRow">
+              <div class="form-group" id="ticketClassGroup" style="display:none;">
+                <label class="form-label">Požadovaná trieda</label>
+                <select id="ticketPozadovanaTrieda" class="form-select">
+                  <option value="">Vyber triedu...</option>
+                  <optgroup label="1. ročník">
+                    <option value="1.A">1.A</option><option value="1.B">1.B</option><option value="1.C">1.C</option><option value="1.D">1.D</option><option value="1.E">1.E</option>
+                  </optgroup>
+                  <optgroup label="2. ročník">
+                    <option value="2.A">2.A</option><option value="2.B">2.B</option><option value="2.C">2.C</option><option value="2.D">2.D</option><option value="2.E">2.E</option>
+                  </optgroup>
+                  <optgroup label="3. ročník">
+                    <option value="3.A">3.A</option><option value="3.B">3.B</option><option value="3.C">3.C</option><option value="3.D">3.D</option><option value="3.E">3.E</option>
+                  </optgroup>
+                  <optgroup label="4. ročník">
+                    <option value="4.A">4.A</option><option value="4.B">4.B</option><option value="4.C">4.C</option><option value="4.D">4.D</option><option value="4.E">4.E</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <div class="form-group" id="ticketGroupGroup">
+                <label class="form-label">Požadovaná skupina</label>
+                <select id="ticketPozadovanaSkupina" class="form-select">
+                  <option value="1">Skupina 1</option>
+                  <option value="2">Skupina 2</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Dôvod / vysvetlenie pre administrátora</label>
+              <textarea id="ticketSprava" class="form-select" rows="3" placeholder="napr. Chcel by som prestúpiť do Skupiny 2 / vymenil som sa so spolužiakom..." required style="resize:vertical;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top:6px;">
+              <span>Odoslať žiadosť adminovi</span>
+              <span>🚀</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Zoznam mojich ticketov -->
+        <div class="glass-card overview-card">
+          <h3 style="margin-bottom: 1rem;">📋 Moje podané žiadosti</h3>
+          <div id="myTicketsContainer" class="my-tips-list" style="max-height: 420px; overflow-y: auto;">
+            <div class="loading-state"><div class="spinner"></div><p>Načítavam žiadosti...</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ ADMIN SECTION ═══ -->
+    <section class="content-section" id="section-admin">
+      <div class="section-header">
+        <h1 class="section-title">⚙️ Administrátorský Panel</h1>
+        <p class="section-subtitle">Vytváranie písomiek, vyhodnocovanie, rozdelenie tried do skupín a predmety</p>
+      </div>
+
+      <div class="stats-grid" id="adminStatsGrid">
+        <div class="stat-card glass-card" style="--accent: #ec4899">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="adminStatUsers">0</div>
+          <div class="stat-label">Používatelia</div>
+        </div>
+        <div class="stat-card glass-card" style="--accent: #7c3aed">
+          <div class="stat-icon">📚</div>
+          <div class="stat-value" id="adminStatPredmety">0</div>
+          <div class="stat-label">Predmety</div>
+        </div>
+        <div class="stat-card glass-card" style="--accent: #f59e0b">
+          <div class="stat-icon">📝</div>
+          <div class="stat-value" id="adminStatPisomky">0</div>
+          <div class="stat-label">Aktívne písomky</div>
+        </div>
+        <div class="stat-card glass-card" style="--accent: #10b981">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-value" id="adminStatTipy">0</div>
+          <div class="stat-label">Celkovo tipov</div>
+        </div>
+        <div class="stat-card glass-card" style="--accent: #f59e0b">
+          <div class="stat-icon">🎫</div>
+          <div class="stat-value" id="adminStatPendingTickets">0</div>
+          <div class="stat-label">Nové Žiadosti</div>
+        </div>
+      </div>
+
+      <!-- Admin Tabs Navigation -->
+      <div class="filter-bar glass-card" style="margin-bottom: 1.5rem;">
+        <button class="chip active" id="adminTabPisomkyBtn">📝 Písomky & Vyhodnocovanie</button>
+        <button class="chip" id="adminTabClassesBtn">👥 Triedy & Skupiny</button>
+        <button class="chip" id="adminTabSubjectsBtn">📚 Správa Predmetov</button>
+        <button class="chip" id="adminTabTicketyBtn">🎫 Žiadosti Žiakov</button>
+      </div>
+
+      <!-- Subview 1: Písomky & Vyhodnocovanie -->
+      <div id="adminViewPisomky">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h3 style="font-size:1.1rem;">Všetky písomky v systéme</h3>
+          <button class="btn btn-primary" onclick="openCreatePisomkaModal()">➕ Vytvoriť novú písomku</button>
+        </div>
+        <div id="adminPisomkyList" class="my-tips-list">
+          <div class="loading-state"><div class="spinner"></div><p>Načítavam...</p></div>
+        </div>
+      </div>
+
+      <!-- Subview 2: Triedy & Skupiny (Accordion) -->
+      <div id="adminViewClasses" style="display:none;">
+        <div style="margin-bottom:1rem;">
+          <h3 style="font-size:1.1rem;">Rozdelenie žiakov podľa tried a skupín</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">
+            Rozklikni triedu a presúvaj žiakov medzi <strong>Skupinou 1</strong> a <strong>Skupinou 2</strong>.
+          </p>
+        </div>
+        <div id="adminClassesContainer">
+          <div class="loading-state"><div class="spinner"></div><p>Načítavam triedy...</p></div>
+        </div>
+      </div>
+
+      <!-- Subview 3: Správa Predmetov -->
+      <div id="adminViewSubjects" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <div>
+            <h3 style="font-size:1.1rem;">Zoznam školských predmetov</h3>
+            <p style="font-size:0.85rem; color:var(--text-secondary);">Môžeš pridávať, mazať a meniť delenie na 2 skupiny.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddSubjectModal()">➕ Pridať predmet</button>
+        </div>
+        <div class="leaderboard glass-card" id="adminSubjectsTable">
+          <div class="loading-state"><div class="spinner"></div><p>Načítavam predmety...</p></div>
+        </div>
+      </div>
+
+      <!-- Subview 4: Správa Ticketov -->
+      <div id="adminViewTickety" style="display:none;">
+        <div style="margin-bottom:1rem;">
+          <h3 style="font-size:1.1rem;">Žiadosti žiakov o zmenu triedy a skupiny</h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary);">
+            Kliknutím na „✅ Schváliť a vykonať“ systém automaticky presunie žiaka do požadovanej triedy / skupiny.
+          </p>
+        </div>
+        <div id="adminTicketsContainer" class="my-tips-list">
+          <div class="loading-state"><div class="spinner"></div><p>Načítavam žiadosti...</p></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══ MODAL: TIPOVANIE NA PÍSOMKU ═══ -->
+  <div class="modal-overlay" id="pisomkaTipModal">
+    <div class="modal glass-card" style="max-width: 650px;">
+      <button class="modal-close" onclick="closeModal('pisomkaTipModal')">&times;</button>
+      <div class="modal-header">
+        <div class="modal-avatar" id="modalPisomkaIcon">📝</div>
+        <div>
+          <h2 class="modal-title" id="modalPisomkaTitle">Písomka</h2>
+          <span class="modal-subtitle" id="modalPisomkaSub">Predmet · Dátum</span>
+        </div>
+      </div>
+      <!-- Študentské nahlasovanie vlastnej reálnej známky -->
+      <div id="myGradeReportContainer"></div>
+
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">
+        Klikni na známku (1 až 5) pri každom spolužiakovi, ktorú si myslíš, že dostane z tejto písomky:
+      </p>
+      <div class="tipping-students-list" id="pisomkaStudentsList">
+        <div class="loading-state"><div class="spinner"></div><p>Načítavam spolužiakov...</p></div>
+      </div>
+      <div style="margin-top:1.5rem; text-align:right;">
+        <button class="btn btn-primary" onclick="closeModal('pisomkaTipModal')">Hotovo ✅</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: VYHODNOTIŤ PÍSOMKU (ADMIN) ═══ -->
+  <div class="modal-overlay" id="evaluateModal">
+    <div class="modal glass-card" style="max-width: 650px;">
+      <button class="modal-close" onclick="closeModal('evaluateModal')">&times;</button>
+      <div class="modal-header">
+        <div class="modal-avatar" style="background:#10b981;">🎓</div>
+        <div>
+          <h2 class="modal-title" id="evalModalTitle">Vyhodnotiť písomku</h2>
+          <span class="modal-subtitle" id="evalModalSub">Zadaj skutočné známky žiakov</span>
+        </div>
+      </div>
+      <!-- Admin eval status banner -->
+      <div id="evalStatusBannerContainer"></div>
+
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:10px;">
+        Zadaj reálnu známku (1–5) pre každého žiaka. Systém automaticky predvyplnil známky, ktoré žiaci sami nahlásili!
+      </p>
+      <div class="tipping-students-list" id="evalStudentsList">
+        <div class="loading-state"><div class="spinner"></div><p>Načítavam...</p></div>
+      </div>
+      <div style="margin-top:1.5rem; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn" onclick="closeModal('evaluateModal')" style="background:rgba(255,255,255,0.06);">Zrušiť</button>
+        <button class="btn btn-primary" id="btnSubmitEvaluation">
+          <span>Uložiť a vyhodnotiť tipy</span>
+          <span>🏆</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: VYTVORIŤ PÍSOMKU (ADMIN) ═══ -->
+  <div class="modal-overlay" id="createPisomkaModal">
+    <div class="modal glass-card" style="max-width: 500px;">
+      <button class="modal-close" onclick="closeModal('createPisomkaModal')">&times;</button>
+      <div class="modal-header">
+        <div class="modal-avatar" style="background:#7c3aed;">📝</div>
+        <div>
+          <h2 class="modal-title">Nová písomka / tipovačka</h2>
+          <span class="modal-subtitle">Zadaj parametre písomky pre triedu</span>
+        </div>
+      </div>
+      <form id="createPisomkaForm" class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Predmet</label>
+          <select id="newPisomkaPredmet" class="form-select" required onchange="handlePredmetChangeInCreate(this.value)">
+            <option value="">Vyber predmet...</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Trieda</label>
+            <select id="newPisomkaTrieda" class="form-select" required>
+              <optgroup label="1. ročník">
+                <option value="1.A">1.A</option>
+                <option value="1.B">1.B</option>
+                <option value="1.C">1.C</option>
+                <option value="1.D">1.D</option>
+                <option value="1.E">1.E</option>
+              </optgroup>
+              <optgroup label="2. ročník">
+                <option value="2.A">2.A</option>
+                <option value="2.B">2.B</option>
+                <option value="2.C">2.C</option>
+                <option value="2.D">2.D</option>
+                <option value="2.E">2.E</option>
+              </optgroup>
+              <optgroup label="3. ročník">
+                <option value="3.A">3.A</option>
+                <option value="3.B">3.B</option>
+                <option value="3.C">3.C</option>
+                <option value="3.D" selected>3.D</option>
+                <option value="3.E">3.E</option>
+              </optgroup>
+              <optgroup label="4. ročník">
+                <option value="4.A">4.A</option>
+                <option value="4.B">4.B</option>
+                <option value="4.C">4.C</option>
+                <option value="4.D">4.D</option>
+                <option value="4.E">4.E</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Skupina</label>
+            <select id="newPisomkaSkupina" class="form-select">
+              <option value="0">Celá trieda</option>
+              <option value="1">Skupina 1</option>
+              <option value="2">Skupina 2</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Názov písomky</label>
+          <input type="text" id="newPisomkaNazov" class="form-select" placeholder="napr. Písomka: CSS Flexbox & Grid" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dátum konania</label>
+          <input type="date" id="newPisomkaDatum" class="form-select" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Popis / témy (voliteľné)</label>
+          <input type="text" id="newPisomkaPopis" class="form-select" placeholder="napr. Teória a praktická úloha">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">
+          <span>Vytvoriť a spustiť tipovanie</span>
+          <span>🚀</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: PRIDAŤ PREDMET (ADMIN) ═══ -->
+  <div class="modal-overlay" id="addSubjectModal">
+    <div class="modal glass-card" style="max-width: 450px;">
+      <button class="modal-close" onclick="closeModal('addSubjectModal')">&times;</button>
+      <div class="modal-header">
+        <div class="modal-avatar" style="background:#06b6d4;">📚</div>
+        <div>
+          <h2 class="modal-title">Pridať školský predmet</h2>
+          <span class="modal-subtitle">Zadaj názov a parametre</span>
+        </div>
+      </div>
+      <form id="addSubjectForm" class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Názov predmetu</label>
+          <input type="text" id="newSubjectNazov" class="form-select" placeholder="napr. Tvorba WWW stránok" required>
+        </div>
+        <div class="form-group" style="flex-direction:row; align-items:center; gap:10px; margin-top:6px;">
+          <input type="checkbox" id="newSubjectGroups" style="width:18px; height:18px; cursor:pointer;">
+          <label for="newSubjectGroups" style="cursor:pointer; font-size:0.9rem;">Predmet je delený na 2 skupiny</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:10px;">
+          <span>Uložiť predmet</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer"></div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
