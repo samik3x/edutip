@@ -3,12 +3,14 @@ const Database = require('better-sqlite3');
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ── Database Setup ──────────────────────────────────────────────
-const db = new Database(path.join(__dirname, 'tipovacka.db'));
+const DB_PATH = process.env.DATABASE_PATH || (fs.existsSync('/data') ? '/data/tipovacka.db' : path.join(__dirname, 'tipovacka.db'));
+const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
