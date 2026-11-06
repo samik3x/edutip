@@ -1,0 +1,16 @@
+{
+  "name": "edutip",
+  "version": "1.0.0",
+  "description": "EduTip - Školské tipovanie známok",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "better-sqlite3": "^11.6.0",
+    "bcryptjs": "^2.4.3",
+    "express-session": "^1.18.1"
+  }
+}
