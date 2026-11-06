@@ -109,6 +109,25 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     return;
   }
 
+  // Validácia veľkého začiatočného písmena na mene a priezvisku
+  const isValidCapitalName = (str) => {
+    if (!str) return false;
+    const parts = str.trim().split(/[\s-]+/).filter(Boolean);
+    return parts.length > 0 && parts.every(part => /^\p{Lu}/u.test(part));
+  };
+
+  if (!isValidCapitalName(meno)) {
+    showError('Meno musí začínať veľkým písmenom (napr. Peter)');
+    document.getElementById('regMeno').focus();
+    return;
+  }
+
+  if (!isValidCapitalName(priezvisko)) {
+    showError('Priezvisko musí začínať veľkým písmenom (napr. Novák)');
+    document.getElementById('regPriezvisko').focus();
+    return;
+  }
+
   if (username.length < 3) {
     showError('Prezývka musí mať aspoň 3 znaky');
     return;

@@ -190,6 +190,20 @@ app.post('/api/auth/register', async (req, res) => {
     if (username.length < 3) return res.status(400).json({ error: 'Prezývka musí mať aspoň 3 znaky' });
     if (password.length < 4) return res.status(400).json({ error: 'Heslo musí mať aspoň 4 znaky' });
 
+    // Validácia veľkého začiatočného písmena na mene a priezvisku
+    const isValidCapitalName = (str) => {
+      if (!str || typeof str !== 'string') return false;
+      const parts = str.trim().split(/[\s-]+/).filter(Boolean);
+      return parts.length > 0 && parts.every(part => /^\p{Lu}/u.test(part));
+    };
+
+    if (!isValidCapitalName(meno)) {
+      return res.status(400).json({ error: 'Meno musí začínať veľkým písmenom (napr. Peter)' });
+    }
+    if (!isValidCapitalName(priezvisko)) {
+      return res.status(400).json({ error: 'Priezvisko musí začínať veľkým písmenom (napr. Novák)' });
+    }
+
     const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
     if (existing) return res.status(400).json({ error: 'Táto prezývka už existuje' });
 
