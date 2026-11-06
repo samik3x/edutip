@@ -94,7 +94,23 @@ db.exec(`
     resolved_at TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS triedy (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nazov TEXT UNIQUE NOT NULL
+  );
 `);
+
+// Auto-seed triedy (1.A - 4.E) if empty
+const triedyCount = db.prepare('SELECT COUNT(*) as c FROM triedy').get().c;
+if (triedyCount === 0) {
+  const ins = db.prepare('INSERT OR IGNORE INTO triedy (nazov) VALUES (?)');
+  for (let r = 1; r <= 4; r++) {
+    for (const l of ['A', 'B', 'C', 'D', 'E']) {
+      ins.run(`${r}.${l}`);
+    }
+  }
+}
 
 // Auto-seed admin user if not exists
 const adminUser = db.prepare('SELECT id FROM users WHERE is_admin = 1').get();
@@ -590,35 +606,53 @@ app.get('/api/triedy', requireAuth, (req, res) => {
 
 // Get users grouped by class and then by group (1 and 2)
 app.get('/api/admin/users/by-class', requireAdmin, (req, res) => {
-  // Pre-initialize all classes 1.A - 4.E
-  const allTriedy = db.prepare('SELECT nazov FROM triedy ORDER BY id').all();
-  const classesMap = {};
-  for (const t of allTriedy) {
-    classesMap[t.nazov] = { skupina1: [], skupina2: [] };
-  }
-
-  const users = db.prepare(`
-    SELECT id, username, meno, priezvisko, datum_narodenia, trieda, skupina, body, is_admin, avatar_color, created_at,
-      (SELECT COUNT(*) FROM tipy_v2 WHERE user_id = users.id) AS pocet_tipov
-    FROM users
-    WHERE trieda != 'Admin'
-    ORDER BY trieda, skupina, priezvisko, meno
-  `).all();
-
-  // Group users into their respective classes
-  for (const u of users) {
-    const cls = u.trieda;
-    if (!classesMap[cls]) {
-      classesMap[cls] = { skupina1: [], skupina2: [] };
+  try {
+    let allTriedy = [];
+    try {
+      allTriedy = db.prepare('SELECT nazov FROM triedy ORDER BY id').all();
+    } catch (e) {
+      // fallback
     }
-    if (u.skupina === 2) {
-      classesMap[cls].skupina2.push(u);
+
+    const classesMap = {};
+    if (allTriedy.length > 0) {
+      for (const t of allTriedy) {
+        classesMap[t.nazov] = { skupina1: [], skupina2: [] };
+      }
     } else {
-      classesMap[cls].skupina1.push(u);
+      for (let r = 1; r <= 4; r++) {
+        for (const l of ['A', 'B', 'C', 'D', 'E']) {
+          classesMap[`${r}.${l}`] = { skupina1: [], skupina2: [] };
+        }
+      }
     }
-  }
 
-  res.json(classesMap);
+    const users = db.prepare(`
+      SELECT id, username, meno, priezvisko, datum_narodenia, trieda, skupina, body, is_admin, avatar_color, created_at,
+        (SELECT COUNT(*) FROM tipy_v2 WHERE user_id = users.id) AS pocet_tipov
+      FROM users
+      WHERE trieda != 'Admin'
+      ORDER BY trieda, skupina, priezvisko, meno
+    `).all();
+
+    // Group users into their respective classes
+    for (const u of users) {
+      const cls = u.trieda;
+      if (!classesMap[cls]) {
+        classesMap[cls] = { skupina1: [], skupina2: [] };
+      }
+      if (u.skupina === 2) {
+        classesMap[cls].skupina2.push(u);
+      } else {
+        classesMap[cls].skupina1.push(u);
+      }
+    }
+
+    res.json(classesMap);
+  } catch (err) {
+    console.error('Error in by-class:', err);
+    res.status(500).json({ error: 'Chyba servera pri načítavaní tried' });
+  }
 });
 
 // Update user group (1 or 2)
