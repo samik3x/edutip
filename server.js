@@ -147,6 +147,11 @@ if (predmetyCount === 0) {
   }
 }
 
+// Ensure teacher names are completely cleared
+try {
+  db.prepare("UPDATE predmety SET ucitel = ''").run();
+} catch (e) {}
+
 const avatarColors = ['#7c3aed', '#06b6d4', '#f43f5e', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#ef4444', '#3b82f6'];
 
 // ── Middleware ───────────────────────────────────────────────────
@@ -237,7 +242,7 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
 // ── PREDMETY (SUBJECTS) ──────────────────────────────────────────
 
 app.get('/api/predmety', requireAuth, (req, res) => {
-  const predmety = db.prepare('SELECT * FROM predmety ORDER BY nazov').all();
+  const predmety = db.prepare('SELECT id, nazov, "" AS ucitel, has_groups FROM predmety ORDER BY nazov').all();
   res.json(predmety);
 });
 
@@ -245,7 +250,7 @@ app.get('/api/predmety', requireAuth, (req, res) => {
 app.get('/api/predmety/edupage', requireAuth, (req, res) => {
   const currentUser = db.prepare('SELECT trieda, skupina, is_admin FROM users WHERE id = ?').get(req.session.userId);
 
-  const predmety = db.prepare('SELECT * FROM predmety ORDER BY nazov').all();
+  const predmety = db.prepare('SELECT id, nazov, "" AS ucitel, has_groups FROM predmety ORDER BY nazov').all();
 
   const result = predmety.map(p => {
     // For admin show all pisomky or filtered; for students show their class
@@ -854,14 +859,19 @@ app.put('/api/admin/tickety/:id/reject', requireAdmin, (req, res) => {
 });
 
 app.get('/api/admin/stats', requireAdmin, (req, res) => {
-  const totalUsers = db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
-  const totalPredmety = db.prepare('SELECT COUNT(*) AS c FROM predmety').get().c;
-  const totalPisomky = db.prepare('SELECT COUNT(*) AS c FROM pisomky').get().c;
-  const activePisomky = db.prepare('SELECT COUNT(*) AS c FROM pisomky WHERE stav = "active"').get().c;
-  const totalTipy = db.prepare('SELECT COUNT(*) AS c FROM tipy_v2').get().c;
-  const pendingTickety = db.prepare('SELECT COUNT(*) AS c FROM tickety WHERE stav = "pending"').get().c;
+  try {
+    const totalUsers = db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
+    const totalPredmety = db.prepare('SELECT COUNT(*) AS c FROM predmety').get().c;
+    const totalPisomky = db.prepare('SELECT COUNT(*) AS c FROM pisomky').get().c;
+    const activePisomky = db.prepare("SELECT COUNT(*) AS c FROM pisomky WHERE stav = 'active'").get().c;
+    const totalTipy = db.prepare('SELECT COUNT(*) AS c FROM tipy_v2').get().c;
+    const pendingTickety = db.prepare("SELECT COUNT(*) AS c FROM tickety WHERE stav = 'pending'").get().c;
 
-  res.json({ totalUsers, totalPredmety, totalPisomky, activePisomky, totalTipy, pendingTickety });
+    res.json({ totalUsers, totalPredmety, totalPisomky, activePisomky, totalTipy, pendingTickety });
+  } catch (err) {
+    console.error('Error in /api/admin/stats:', err);
+    res.status(500).json({ error: 'Chyba servera pri načítaní štatistík' });
+  }
 });
 
 // Single page app fallback

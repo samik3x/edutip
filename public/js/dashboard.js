@@ -182,7 +182,7 @@ function populateSubjectDropdowns() {
   if (!select) return;
   select.innerHTML = '<option value="">Vyber predmet...</option>';
   allPredmetyList.forEach(p => {
-    select.innerHTML += `<option value="${p.id}" data-groups="${p.has_groups}">${p.nazov} ${p.ucitel ? '(' + p.ucitel + ')' : ''}</option>`;
+    select.innerHTML += `<option value="${p.id}" data-groups="${p.has_groups}">${p.nazov}</option>`;
   });
 }
 
@@ -686,7 +686,8 @@ window.openAddSubjectModal = function() {
 document.getElementById('addSubjectForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nazov = document.getElementById('newSubjectNazov').value.trim();
-  const ucitel = document.getElementById('newSubjectUcitel').value.trim();
+  const ucitelEl = document.getElementById('newSubjectUcitel');
+  const ucitel = ucitelEl ? ucitelEl.value.trim() : '';
   const has_groups = document.getElementById('newSubjectGroups').checked ? 1 : 0;
 
   const res = await api('/api/admin/predmety', {
@@ -997,7 +998,6 @@ async function loadAdminSubjects() {
         <thead>
           <tr style="border-bottom:1px solid var(--border); color:var(--text-muted); font-size:0.8rem; text-transform:uppercase;">
             <th style="padding:10px 14px;">Predmet</th>
-            <th style="padding:10px 14px;">Učiteľ</th>
             <th style="padding:10px 14px;">Skupiny</th>
             <th style="padding:10px 14px; text-align:right;">Akcie</th>
           </tr>
@@ -1006,7 +1006,6 @@ async function loadAdminSubjects() {
           ${predmety.map(p => `
             <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
               <td style="padding:10px 14px; font-weight:600;">${p.nazov}</td>
-              <td style="padding:10px 14px; color:var(--text-secondary);">${p.ucitel || '-'}</td>
               <td style="padding:10px 14px;">
                 ${p.has_groups ? '<span class="badge-groups-tag">2 skupiny</span>' : '<span style="color:var(--text-muted); font-size:0.8rem;">Celá trieda</span>'}
               </td>

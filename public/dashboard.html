@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduTip | Školské tipovanie známok</title>
+  <title>EduTip 2026 | Školské tipovanie známok</title>
+  <link rel="icon" type="image/png" href="/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -14,9 +15,9 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <span class="logo-icon">🎯</span>
-        <span class="logo-text">EduTip</span>
+      <div class="sidebar-logo" style="display:flex; align-items:center; gap:8px;">
+        <img src="/img/logo.png" alt="EduTip" style="width: 32px; height: 32px; border-radius: 50%; object-fit: contain;">
+        <span class="logo-text">EduTip <span style="font-size:0.65em; color:var(--accent-cyan); font-weight:700;">2026</span></span>
       </div>
       <button class="sidebar-toggle" id="sidebarToggle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -602,17 +603,13 @@
         <div class="modal-avatar" style="background:#06b6d4;">📚</div>
         <div>
           <h2 class="modal-title">Pridať školský predmet</h2>
-          <span class="modal-subtitle">Zadaj názov a učiteľa</span>
+          <span class="modal-subtitle">Zadaj názov a parametre</span>
         </div>
       </div>
       <form id="addSubjectForm" class="modal-body">
         <div class="form-group">
           <label class="form-label">Názov predmetu</label>
           <input type="text" id="newSubjectNazov" class="form-select" placeholder="napr. Tvorba WWW stránok" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Meno učiteľa</label>
-          <input type="text" id="newSubjectUcitel" class="form-select" placeholder="napr. Tomáš Zekucia">
         </div>
         <div class="form-group" style="flex-direction:row; align-items:center; gap:10px; margin-top:6px;">
           <input type="checkbox" id="newSubjectGroups" style="width:18px; height:18px; cursor:pointer;">
@@ -628,6 +625,6 @@
   <!-- Toast Container -->
   <div id="toastContainer"></div>
 
-  <script src="/js/dashboard.js"></script>
+  <script src="/js/dashboard.js?v=2"></script>
 </body>
 </html>
