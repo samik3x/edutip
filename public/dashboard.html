@@ -406,8 +406,15 @@
 
       <!-- Subview 1: Písomky & Vyhodnocovanie -->
       <div id="adminViewPisomky">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <h3 style="font-size:1.1rem;">Všetky písomky v systéme</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="font-size:1.1rem; margin-bottom:6px;">Správa písomiek a vyhodnocovanie</h3>
+            <div class="filter-chips">
+              <button class="chip active" id="filterPisomkyActive" onclick="setAdminPisomkyFilter('active')">⏳ Na vyhodnotenie</button>
+              <button class="chip" id="filterPisomkyResolved" onclick="setAdminPisomkyFilter('resolved')">✅ Vyhodnotené</button>
+              <button class="chip" id="filterPisomkyAll" onclick="setAdminPisomkyFilter('all')">Všetky</button>
+            </div>
+          </div>
           <button class="btn btn-primary" onclick="openCreatePisomkaModal()">➕ Vytvoriť novú písomku</button>
         </div>
         <div id="adminPisomkyList" class="my-tips-list">
@@ -625,6 +632,6 @@
   <!-- Toast Container -->
   <div id="toastContainer"></div>
 
-  <script src="/js/dashboard.js?v=2"></script>
+  <script src="/js/dashboard.js?v=3"></script>
 </body>
 </html>

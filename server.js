@@ -152,6 +152,15 @@ try {
   db.prepare("UPDATE predmety SET ucitel = ''").run();
 } catch (e) {}
 
+// Auto-heal / sync body for regular students based on their actual tips (prevents duplicates from re-evaluating)
+try {
+  db.exec(`
+    UPDATE users
+    SET body = COALESCE((SELECT SUM(ziskane_body) FROM tipy_v2 WHERE tipy_v2.user_id = users.id), 0)
+    WHERE is_admin = 0;
+  `);
+} catch (e) {}
+
 const avatarColors = ['#7c3aed', '#06b6d4', '#f43f5e', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#ef4444', '#3b82f6'];
 
 // ── Middleware ───────────────────────────────────────────────────
@@ -552,6 +561,10 @@ app.post('/api/admin/pisomky/:id/vyhodnotit', requireAdmin, (req, res) => {
   const pisomka = db.prepare('SELECT * FROM pisomky WHERE id = ?').get(pisomkaId);
   if (!pisomka) return res.status(404).json({ error: 'Písomka neexistuje' });
 
+  if (pisomka.stav === 'resolved') {
+    return res.status(400).json({ error: 'Táto písomka už bola vyhodnotená. Body už boli rozdané.' });
+  }
+
   const executeResolution = db.transaction(() => {
     // 1. Insert or update actual grades and mark as confirmed
     const insGrade = db.prepare(`
@@ -570,8 +583,8 @@ app.post('/api/admin/pisomky/:id/vyhodnotit', requireAdmin, (req, res) => {
     // 2. Mark pisomka as resolved
     db.prepare("UPDATE pisomky SET stav = 'resolved' WHERE id = ?").run(pisomkaId);
 
-    // 3. Score all tips for this pisomka
-    const tips = db.prepare('SELECT * FROM tipy_v2 WHERE pisomka_id = ?').all(pisomkaId);
+    // 3. Score all tips for this pisomka (only tips that haven't been scored yet)
+    const tips = db.prepare('SELECT * FROM tipy_v2 WHERE pisomka_id = ? AND (bodovane = 0 OR bodovane IS NULL)').all(pisomkaId);
     let totalPointsAwarded = 0;
 
     for (const tip of tips) {

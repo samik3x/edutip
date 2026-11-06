@@ -278,9 +278,15 @@ function renderEdupageSubjects(subjects) {
                       <span>${p.stav === 'active' ? '🎯 Tipovať na spolužiakov' : '📊 Pozrieť tipy & výsledky'}</span>
                     </button>
                     ${currentUser.is_admin ? `
-                      <button class="btn" style="padding:8px 12px; font-size:0.85rem; background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);" onclick="openEvaluateModal(${p.id})">
-                        📝 Vyhodnotiť
-                      </button>
+                      ${p.stav === 'active' ? `
+                        <button class="btn" style="padding:8px 12px; font-size:0.85rem; background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);" onclick="openEvaluateModal(${p.id})">
+                          📝 Vyhodnotiť
+                        </button>
+                      ` : `
+                        <span style="display:inline-flex; align-items:center; gap:4px; padding:6px 12px; font-size:0.8rem; font-weight:700; background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); border-radius:999px;">
+                          ✅ Vyhodnotená
+                        </span>
+                      `}
                       <button class="btn" style="padding:8px 10px; font-size:0.85rem; background:rgba(244,63,94,0.1); color:#f43f5e; border:1px solid rgba(244,63,94,0.2);" onclick="deletePisomka(${p.id})">
                         🗑️
                       </button>
@@ -505,36 +511,53 @@ window.openEvaluateModal = async function(pisomkaId) {
   openModal('evaluateModal');
   const list = document.getElementById('evalStudentsList');
   const bannerContainer = document.getElementById('evalStatusBannerContainer');
+  const submitBtn = document.getElementById('btnSubmitEvaluation');
   list.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Načítavam zoznam žiakov...</p></div>';
 
   const data = await api(`/api/pisomky/${pisomkaId}`);
   if (!data) return;
 
   const { pisomka, students } = data;
-  document.getElementById('evalModalTitle').textContent = `Vyhodnotiť: ${pisomka.nazov}`;
+  const isResolved = pisomka.stav === 'resolved';
+
+  document.getElementById('evalModalTitle').textContent = isResolved ? `Vyhodnotená: ${pisomka.nazov}` : `Vyhodnotiť: ${pisomka.nazov}`;
   document.getElementById('evalModalSub').textContent = `${pisomka.predmet_nazov} · Trieda ${pisomka.trieda}`;
+
+  if (submitBtn) {
+    submitBtn.style.display = isResolved ? 'none' : 'inline-flex';
+  }
 
   const nahlasenychCount = students.filter(s => s.nahlasena_znamka !== null).length;
   const totalCount = students.length;
   const allReported = totalCount > 0 && nahlasenychCount === totalCount;
 
   if (bannerContainer) {
-    bannerContainer.innerHTML = `
-      <div class="eval-summary-banner">
-        <div>
-          <span>📊 <strong>Nahlásené známky od žiakov:</strong> </span>
-          <span style="font-weight:700; color:${allReported ? '#10b981' : nahlasenychCount > 0 ? '#f59e0b' : 'var(--text-muted)'};">
-            ${nahlasenychCount} z ${totalCount} (${totalCount > 0 ? Math.round((nahlasenychCount / totalCount) * 100) : 0}%)
-          </span>
-          ${allReported ? '<span style="color:#10b981; margin-left:6px; font-weight:600;">🎉 Všetci žiaci nahlásili!</span>' : ''}
+    if (isResolved) {
+      bannerContainer.innerHTML = `
+        <div class="eval-summary-banner" style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); color:#10b981;">
+          <div>
+            <span>✅ <strong>Táto písomka už bola vyhodnotená.</strong> Všetky body už boli rozdané do rebríčka.</span>
+          </div>
         </div>
-        ${nahlasenychCount > 0 ? `
-          <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem; background:rgba(124,58,237,0.2); color:#a78bfa; border:1px solid rgba(124,58,237,0.4);" onclick="fillReportedGradesInEval()">
-            ⚡ Predvyplniť nahlásené
-          </button>
-        ` : ''}
-      </div>
-    `;
+      `;
+    } else {
+      bannerContainer.innerHTML = `
+        <div class="eval-summary-banner">
+          <div>
+            <span>📊 <strong>Nahlásené známky od žiakov:</strong> </span>
+            <span style="font-weight:700; color:${allReported ? '#10b981' : nahlasenychCount > 0 ? '#f59e0b' : 'var(--text-muted)'};">
+              ${nahlasenychCount} z ${totalCount} (${totalCount > 0 ? Math.round((nahlasenychCount / totalCount) * 100) : 0}%)
+            </span>
+            ${allReported ? '<span style="color:#10b981; margin-left:6px; font-weight:600;">🎉 Všetci žiaci nahlásili!</span>' : ''}
+          </div>
+          ${nahlasenychCount > 0 ? `
+            <button type="button" class="btn" style="padding:4px 8px; font-size:0.75rem; background:rgba(124,58,237,0.2); color:#a78bfa; border:1px solid rgba(124,58,237,0.4);" onclick="fillReportedGradesInEval()">
+              ⚡ Predvyplniť nahlásené
+            </button>
+          ` : ''}
+        </div>
+      `;
+    }
   }
 
   list.innerHTML = students.map(s => {
@@ -558,7 +581,7 @@ window.openEvaluateModal = async function(pisomkaId) {
           </div>
         </div>
         <div>
-          <select class="form-select eval-grade-select" data-student-id="${s.id}" data-nahlasena="${s.nahlasena_znamka || ''}" style="padding:6px 12px; width:130px;">
+          <select class="form-select eval-grade-select" data-student-id="${s.id}" data-nahlasena="${s.nahlasena_znamka || ''}" ${isResolved ? 'disabled' : ''} style="padding:6px 12px; width:130px; ${isResolved ? 'opacity:0.8; cursor:not-allowed;' : ''}">
             <option value="">Bez známky</option>
             <option value="1" ${selectedGrade == 1 ? 'selected' : ''}>1 (Výborný)</option>
             <option value="2" ${selectedGrade == 2 ? 'selected' : ''}>2 (Chválitebný)</option>
@@ -794,9 +817,20 @@ async function loadAdminStats() {
   }
 }
 
-// Admin: Load Pisomky
+// Admin: Load Pisomky with filter
+let currentAdminPisomkyFilter = 'active';
+
+window.setAdminPisomkyFilter = function(filter) {
+  currentAdminPisomkyFilter = filter;
+  document.getElementById('filterPisomkyActive')?.classList.toggle('active', filter === 'active');
+  document.getElementById('filterPisomkyResolved')?.classList.toggle('active', filter === 'resolved');
+  document.getElementById('filterPisomkyAll')?.classList.toggle('active', filter === 'all');
+  loadAdminPisomky();
+};
+
 async function loadAdminPisomky() {
   const container = document.getElementById('adminPisomkyList');
+  if (!container) return;
   container.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Načítavam...</p></div>';
 
   const allPisomky = await api('/api/admin/pisomky') || [];
@@ -806,12 +840,31 @@ async function loadAdminPisomky() {
     return;
   }
 
-  container.innerHTML = allPisomky.map(p => {
+  let filtered = allPisomky;
+  if (currentAdminPisomkyFilter === 'active') {
+    filtered = allPisomky.filter(p => p.stav === 'active');
+  } else if (currentAdminPisomkyFilter === 'resolved') {
+    filtered = allPisomky.filter(p => p.stav === 'resolved');
+  }
+
+  if (filtered.length === 0) {
+    let emptyMsg = 'Zatiaľ nie sú vytvorené žiadne písomky.';
+    if (currentAdminPisomkyFilter === 'active') {
+      emptyMsg = '🎉 Žiadne písomky nečakajú na vyhodnotenie! Všetko je vyhodnotené.';
+    } else if (currentAdminPisomkyFilter === 'resolved') {
+      emptyMsg = 'Zatiaľ nebola vyhodnotená žiadna písomka.';
+    }
+    container.innerHTML = `<div class="empty-state"><p class="empty-state-text">${emptyMsg}</p></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(p => {
+    const isResolved = p.stav === 'resolved';
     const isAllReported = p.pocet_ziakov > 0 && p.pocet_nahlasenych >= p.pocet_ziakov;
     const isPartial = p.pocet_nahlasenych > 0 && !isAllReported;
 
     return `
-      <div class="pisomka-card">
+      <div class="pisomka-card ${isResolved ? 'pisomka-card-resolved' : ''}">
         <div class="pisomka-info">
           <h4>${p.nazov}</h4>
           <div class="pisomka-meta">
@@ -819,8 +872,8 @@ async function loadAdminPisomky() {
             <span>📅 ${formatDate(p.datum)}</span>
             <span>👥 Trieda ${p.trieda} (Skupina ${p.skupina || 'Celá'})</span>
             <span>🎯 ${p.pocet_tipov || 0} tipov</span>
-            <span>${p.stav === 'active' ? '<span style="color:#10b981;">🟢 Otvorené tipovanie</span>' : '<span style="color:#888;">🏁 Vyhodnotená</span>'}</span>
-            ${p.stav === 'active' ? `
+            <span>${!isResolved ? '<span style="color:#10b981; font-weight:600;">🟢 Otvorené tipovanie</span>' : '<span style="color:#888; font-weight:600;">🏁 Vyhodnotená</span>'}</span>
+            ${!isResolved ? `
               <span class="badge-pill" style="${isAllReported ? 'background:rgba(16,185,129,0.2); color:#10b981; border:1px solid rgba(16,185,129,0.4);' : isPartial ? 'background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.4);' : 'background:rgba(255,255,255,0.06); color:var(--text-muted);'} font-size:0.75rem;">
                 ${isAllReported ? '🎉 Všetci žiaci nahlásili známky (' + p.pocet_nahlasenych + '/' + p.pocet_ziakov + ')' :
                   isPartial ? '⏳ Nahlásené známky: ' + p.pocet_nahlasenych + '/' + p.pocet_ziakov :
@@ -830,9 +883,18 @@ async function loadAdminPisomky() {
           </div>
         </div>
         <div class="pisomka-actions">
-          <button class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem;" onclick="openEvaluateModal(${p.id})">
-            ${isAllReported ? '⚡ Skontrolovať & Vyhodnotiť' : '📝 Zadať známky & Vyhodnotiť'}
-          </button>
+          ${!isResolved ? `
+            <button class="btn btn-primary" style="padding:6px 14px; font-size:0.8rem;" onclick="openEvaluateModal(${p.id})">
+              ${isAllReported ? '⚡ Skontrolovať & Vyhodnotiť' : '📝 Zadať známky & Vyhodnotiť'}
+            </button>
+          ` : `
+            <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; font-size:0.8rem; font-weight:700; background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); border-radius:999px;">
+              ✅ Vyhodnotené
+            </span>
+            <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:rgba(255,255,255,0.06); color:var(--text-secondary); border:1px solid var(--border);" onclick="openPisomkaTipModal(${p.id})">
+              👁️ Výsledky
+            </button>
+          `}
           <button class="btn" style="padding:6px 10px; font-size:0.8rem; background:rgba(244,63,94,0.15); color:#f43f5e; border:1px solid rgba(244,63,94,0.3);" onclick="deletePisomka(${p.id})">
             Zmazať
           </button>
